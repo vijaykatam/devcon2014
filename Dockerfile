@@ -38,12 +38,14 @@ RUN bash -c 'echo ". /opt/rh/python27/root/usr/bin/virtualenvwrapper.sh" > /.bas
 
 # setup virtualenv for app and its location
 RUN mkdir -p /opt/djangoprojects/devcon2014
-RUN mkvirtualenv devcon2014
+RUN source /opt/rh/python27/root/usr/bin/virtualenvwrapper.sh && mkvirtualenv devcon2014
 # WORKDIR /opt/.virtualenvs/devcon2014
 # setup current virtualenv
-RUN workon devcon2014 && pip install Django
+RUN source /opt/rh/python27/root/usr/bin/virtualenvwrapper.sh && workon devcon2014 && pip install Django
 WORKDIR /opt/djangoprojects
-# RUN git clone project location
-# WORKDIR /opt/djangoprojects/devcon2014
-# ENTRYPOINT [""]
-# EXPOSE PORT
+RUN git clone https://github.com/vijaykatam/devcon2014.git
+WORKDIR /opt/djangoprojects/devcon2014/sample_app
+RUN bash -c 'echo "source /opt/rh/python27/root/usr/bin/virtualenvwrapper.sh && workon devcon2014 && python manage.py runserver localhost:49000"' > sample_app.sh
+EXPOSE 49000
+ENTRYPOINT ["sample_app.sh"]
+
