@@ -39,13 +39,17 @@ RUN bash -c 'echo ". /opt/rh/python27/root/usr/bin/virtualenvwrapper.sh" > /.bas
 # setup virtualenv for app and its location
 RUN mkdir -p /opt/djangoprojects/devcon2014
 RUN source /opt/rh/python27/root/usr/bin/virtualenvwrapper.sh && mkvirtualenv devcon2014
-# WORKDIR /opt/.virtualenvs/devcon2014
+
 # setup current virtualenv
 RUN source /opt/rh/python27/root/usr/bin/virtualenvwrapper.sh && workon devcon2014 && pip install Django
+RUN source /opt/rh/python27/root/usr/bin/virtualenvwrapper.sh && workon devcon2014 && pip install supervisor
+
 WORKDIR /opt/djangoprojects
+RUN rm -rf devcon2014
 RUN git clone https://github.com/vijaykatam/devcon2014.git
 WORKDIR /opt/djangoprojects/devcon2014/sample_app
-RUN bash -c 'echo "source /opt/rh/python27/root/usr/bin/virtualenvwrapper.sh && workon devcon2014 && python manage.py runserver localhost:49000"' > sample_app.sh
-EXPOSE 49000
-ENTRYPOINT ["sample_app.sh"]
+EXPOSE 8000
+CMD ["-c", "/opt/djangoprojects/devcon2014/supervisord.conf"]
+ENTRYPOINT ["/opt/.virtualenvs/devcon2014/bin/supervisord"]
+
 
