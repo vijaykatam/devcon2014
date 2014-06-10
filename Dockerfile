@@ -43,6 +43,7 @@ RUN source /opt/rh/python27/root/usr/bin/virtualenvwrapper.sh && mkvirtualenv de
 # setup current virtualenv
 RUN source /opt/rh/python27/root/usr/bin/virtualenvwrapper.sh && workon devcon2014 && pip install Django
 RUN source /opt/rh/python27/root/usr/bin/virtualenvwrapper.sh && workon devcon2014 && pip install supervisor
+RUN source /opt/rh/python27/root/usr/bin/virtualenvwrapper.sh && workon devcon2014 && pip install gunicorn
 
 WORKDIR /opt/djangoprojects
 RUN rm -rf devcon2014
