@@ -45,11 +45,23 @@ RUN source /opt/rh/python27/root/usr/bin/virtualenvwrapper.sh && workon devcon20
 RUN source /opt/rh/python27/root/usr/bin/virtualenvwrapper.sh && workon devcon2014 && pip install supervisor
 RUN source /opt/rh/python27/root/usr/bin/virtualenvwrapper.sh && workon devcon2014 && pip install gunicorn
 
+# sshd
+RUN echo 'root:secret' | chpasswd
+RUN yum install -y openssh-server
+RUN mkdir -p /var/run/sshd ; chmod -rx /var/run/sshd
+# http://stackoverflow.com/questions/2419412/ssh-connection-stop-at-debug1-ssh2-msg-kexinit-sent
+RUN ssh-keygen -t rsa -f /etc/ssh/ssh_host_rsa_key
+# Bad security, add a user and sudo instead!
+RUN sed -ri 's/#PermitRootLogin yes/PermitRootLogin yes/g' /etc/ssh/sshd_config
+# http://stackoverflow.com/questions/18173889/cannot-access-centos-sshd-on-docker
+RUN sed -ri 's/UsePAM yes/#UsePAM yes/g' /etc/ssh/sshd_config
+RUN sed -ri 's/#UsePAM no/UsePAM no/g' /etc/ssh/sshd_config
+
 WORKDIR /opt/djangoprojects
 RUN rm -rf devcon2014
 RUN git clone https://github.com/vijaykatam/devcon2014.git
 WORKDIR /opt/djangoprojects/devcon2014/sample_app
-EXPOSE 8000
+EXPOSE 8000 22
 CMD ["-c", "/opt/djangoprojects/devcon2014/supervisord.conf"]
 ENTRYPOINT ["/opt/.virtualenvs/devcon2014/bin/supervisord"]
 
